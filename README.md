@@ -1,8 +1,8 @@
-# AI Virtual Mouse
+# AI Virtual Painter
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-AI Virtual Mouse is a computer vision-based system that allows users to control their cursor using hand gestures captured by a webcam. This project leverages **MediaPipe** for hand tracking and **PyAutoGUI** for mouse control.
+AI Virtual Painter is a computer vision-based system that allows users to draw on a virtual canvas using hand gestures captured by a webcam. This project leverages **MediaPipe** for hand tracking and **OpenCV** for image processing and visualization.
 
 ---
 
@@ -22,11 +22,11 @@ AI Virtual Mouse is a computer vision-based system that allows users to control 
 
 ## Overview
 
-This project implements a virtual mouse controlled by hand gestures. Using your webcam, you can:
+This project implements a virtual painting canvas controlled by hand gestures. Using your webcam, you can:
 
-- **Move the cursor** by pointing with your index finger.
-- **Perform left-clicks** by bringing your index and middle fingers together.
-- **Perform right-clicks** by bringing your index finger and thumb together.
+- **Draw on a virtual canvas** by moving your index finger.
+- **Select different colors** from a menu at the top of the screen.
+- **Erase parts of your drawing** by selecting the eraser tool.
 - **Exit the program** by pressing the `q` key.
 
 ---
@@ -39,7 +39,6 @@ Ensure you have the following installed:
 - OpenCV
 - NumPy
 - MediaPipe
-- PyAutoGUI
 - A working webcam
 
 ---
@@ -49,14 +48,14 @@ Ensure you have the following installed:
 Clone this repository:
 
 ```bash
-git clone https://github.com/yourusername/ai-virtual-mouse.git
-cd ai-virtual-mouse
+git clone https://github.com/yourusername/ai-virtual-painter.git
+cd ai-virtual-painter
 ```
 
 Install the required dependencies:
 
 ```bash
-pip install opencv-python numpy mediapipe pyautogui
+pip install opencv-python numpy mediapipe
 ```
 
 ---
@@ -66,107 +65,107 @@ pip install opencv-python numpy mediapipe pyautogui
 Run the main script:
 
 ```bash
-python AI_VIRTUAL_MOUSE.py
+python VIRTUAL_PAINTER.py
 ```
 
 ---
 
 ## Gesture Controls
 
-| Gesture          | Action                 |
+| Gesture | Action |
 |-----------------|------------------------|
-| Index finger up | Move cursor            |
-| Index + Middle fingers close | Left Click |
-| Index finger + Thumb close   | Right Click |
-| Press 'q' key  | Exit program            |
+| Index finger up | Drawing mode |
+| Index + Middle fingers up | Selection mode |
+| Point to color menu with two fingers | Select color/eraser |
+| Press 'q' key | Exit program |
 
 ---
 
 ## Code Explanation
 
-### `AI_VIRTUAL_MOUSE.py`
+### `VIRTUAL_PAINTER.py`
 
-This script contains the main logic for hand gesture-based cursor control.
+This script contains the main logic for hand gesture-based painting.
 
 - **Initialization and Setup:**
-  ```python
-  pyautogui.FAILSAFE = True  # Move mouse to corner to abort
-  pyautogui.PAUSE = 0.1  # Small delay between commands
-  ```
-  - `FAILSAFE`: Move the mouse to the corner to exit safely.
-  - `PAUSE`: Prevents excessive execution speed.
-
-- **Helper Functions:**
-  - `finger_up(landmarks, finger_idx)`: Checks if a specific finger is raised.
-  - `get_fingers_up(landmarks)`: Returns a list of raised fingers.
-  - `find_distance(p1, p2, img, draw, r, t)`: Calculates the Euclidean distance between two landmarks.
+```python
+brushThickness = 15
+eraserThickness = 100
+imgCanvas = np.zeros((720, 1280, 3), np.uint8)
+```
+- Defines brush and eraser thickness.
+- Creates a blank canvas for drawing.
 
 - **Main Loop Features:**
-  - **Hand Detection:**
-    ```python
-    results = hands.process(imgRGB)
-    if results.multi_hand_landmarks:
-        hand_landmarks = results.multi_hand_landmarks[0]
-        mp_draw.draw_landmarks(img, hand_landmarks, mp_hands.HAND_CONNECTIONS)
-    ```
-  - **Mouse Movement:**
-    ```python
-    if fingers[1] and not any(fingers[2:]):
-        pyautogui.moveTo(clocX, clocY)
-    ```
-  - **Click Detection:**
-    ```python
-    if fingers[1] and fingers[2]:
-        pyautogui.leftClick()
-    if fingers[1] and fingers[0]:
-        pyautogui.rightClick()
-    ```
+
+- **Hand Detection:**
+```python
+img = detector.findHands(img)
+lmList, _ = detector.findPosition(img, draw=False)
+```
+- **Mode Selection:**
+```python
+if fingers[1] and fingers[2]:
+    print("Selection Mode")
+    # Color selection logic
+```
+- **Drawing:**
+```python
+if fingers[1] and fingers[2] == False:
+    cv2.circle(img, (x1, y1), 15, drawColor, cv2.FILLED)
+    print("Drawing Mode")
+    # Drawing logic
+```
 
 ### `HAND_TRACKING_MODULE.py`
 
 This module provides a reusable class for detecting and tracking hand movements.
 
 - **Hand Detection:**
-  ```python
-  def findHands(self, img, draw=True):
-      imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-      self.results = self.hands.process(imgRGB)
-      return img
-  ```
+```python
+def findHands(self, img, draw=True):
+    imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    self.results = self.hands.process(imgRGB)
+    return img
+```
 - **Finger Tracking:**
-  ```python
-  def fingersUp(self):
-      return [1 if self.lmList[self.tipIds[i]][2] < self.lmList[self.tipIds[i] - 2][2] else 0 for i in range(1, 5)]
-  ```
+```python
+def fingersUp(self):
+    fingers = []
+    # Checks which fingers are extended
+    return fingers
+```
 
 ---
 
 ## Customization
 
-You can adjust parameters to improve accuracy and responsiveness:
+You can adjust parameters to personalize your experience:
 
-- **Sensitivity:**
-  ```python
-  frameR = 100  # Adjust frame reduction size
-  smoothening = 7  # Adjust smoothening for movement
-  ```
-- **Click Distances:**
-  ```python
-  if length < 40:  # Left click threshold
-  if length < 80:  # Right click threshold
-  ```
+- **Brush Settings:**
+```python
+brushThickness = 15  # Adjust brush thickness
+eraserThickness = 100  # Adjust eraser thickness
+```
+- **Camera Resolution:**
+```python
+cap.set(3, 1680)  # Width
+cap.set(4, 820)   # Height
+```
+- **Colors:**
+Modify the color palette by changing the RGB values in the `drawColor` variable.
 
 ---
 
 ## Troubleshooting
 
-| Issue                  | Solution                                      |
+| Issue | Solution |
 |------------------------|-----------------------------------------------|
-| Poor detection         | Ensure good lighting and a clear background  |
-| Erratic cursor movement | Increase smoothening value                  |
-| False clicks          | Increase click distance thresholds            |
-| No detection         | Check webcam functionality                    |
-| Performance issues   | Lower camera resolution or FPS                |
+| Poor detection | Ensure good lighting and a clear background |
+| Drawing not appearing | Check that your index finger is properly tracked |
+| Colors not selecting | Make sure both index and middle fingers are detected in selection mode |
+| No detection | Check webcam functionality |
+| Performance issues | Lower camera resolution or brush thickness |
 
 ---
 
