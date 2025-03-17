@@ -1,8 +1,8 @@
 # Virtual Painter
 
-![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-AI Virtual Painter is a computer vision-based system that allows users to draw on a virtual canvas using hand gestures captured by a webcam. This project leverages **MediaPipe** for hand tracking and **OpenCV** for image processing and visualization.
+
+Virtual Painter is a computer vision-based system that allows users to draw on a virtual canvas using hand gestures captured by a webcam. This project leverages **MediaPipe** for hand tracking and **OpenCV** for image processing and visualization.
 
 ---
 
@@ -168,10 +168,6 @@ Modify the color palette by changing the RGB values in the `drawColor` variable.
 | Performance issues | Lower camera resolution or brush thickness |
 
 ---
-
-## License
-
-This project is licensed under the MIT License.
 
 ---
 
